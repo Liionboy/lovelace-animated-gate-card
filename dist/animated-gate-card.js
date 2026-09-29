@@ -1,0 +1,129 @@
+const CARD_TYPE = "animated-gate-card";
+const VERSION = "1.0.0";
+
+const GATE_ART = `<svg class="gate-art" viewBox="0 0 420 270" role="img" aria-label="Illustration of a double-leaf entrance gate">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#dff3fa"/><stop offset="1" stop-color="#f8fbf7"/></linearGradient>
+    <linearGradient id="pillar" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#c2cdd1"/><stop offset=".48" stop-color="#f4f4ee"/><stop offset="1" stop-color="#a9b8bf"/></linearGradient>
+    <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#405d69"/><stop offset=".5" stop-color="#1e3945"/><stop offset="1" stop-color="#102833"/></linearGradient>
+    <linearGradient id="drive" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#b8c6c1"/><stop offset="1" stop-color="#738a84"/></linearGradient>
+    <filter id="shadow" x="-.2" y="-.2" width="1.4" height="1.5"><feDropShadow dx="0" dy="6" stdDeviation="5" flood-color="#203c43" flood-opacity=".2"/></filter>
+    <pattern id="stone" width="30" height="22" patternUnits="userSpaceOnUse"><path d="M0 21.5h30M15 0v11M0 11h30M7 11v10" fill="none" stroke="#8d9ca0" stroke-opacity=".2" stroke-width="1"/></pattern>
+  </defs>
+  <rect width="420" height="270" rx="26" fill="url(#sky)"/>
+  <circle cx="347" cy="54" r="24" fill="#fff2c5" opacity=".8"/>
+  <path d="M0 153c54-36 102-21 151-39 55-20 111-13 162 4 43 14 72 7 107-8v67H0z" fill="#c5d7c8"/>
+  <path d="M0 178c77-25 143-7 215-17 83-12 145 4 205-11v56H0z" fill="#9eb7a3"/>
+  <path d="M0 203h420v67H0z" fill="url(#drive)"/>
+  <path d="M0 204h420" stroke="#edf1e9" stroke-width="3" opacity=".8"/>
+  <path d="M162 203l-34 67M258 203l34 67" stroke="#d9e0d8" stroke-width="2" opacity=".7"/>
+  <g opacity=".75" stroke="#647f71" stroke-width="4" fill="none"><path d="M0 177h63m294 0h63"/><path d="M12 165v25m17-25v25m17-25v25m17-25v25m294-25v25m17-25v25m17-25v25m17-25v25"/></g>
+  <ellipse cx="210" cy="211" rx="144" ry="10" fill="#203c43" opacity=".16"/>
+  <g class="gate-structure" filter="url(#shadow)">
+    <g class="gate-pillar"><rect x="47" y="91" width="37" height="120" rx="3" fill="url(#pillar)"/><rect x="47" y="91" width="37" height="120" rx="3" fill="url(#stone)"/><path d="M42 91h47l-5-12H47z" fill="#e9ece6"/><path d="M42 211h47v7H42z" fill="#7b8f92"/><rect x="54" y="67" width="23" height="24" rx="3" fill="url(#pillar)"/><path d="M50 67h31l-4-9H54z" fill="#edf0ea"/></g>
+    <g class="gate-pillar"><rect x="336" y="91" width="37" height="120" rx="3" fill="url(#pillar)"/><rect x="336" y="91" width="37" height="120" rx="3" fill="url(#stone)"/><path d="M331 91h47l-5-12h-37z" fill="#e9ece6"/><path d="M331 211h47v7h-47z" fill="#7b8f92"/><rect x="343" y="67" width="23" height="24" rx="3" fill="url(#pillar)"/><path d="M339 67h31l-4-9h-23z" fill="#edf0ea"/></g>
+    <g class="gate-panel gate-panel-left">
+      <rect x="84" y="126" width="126" height="80" rx="2" fill="url(#metal)" stroke="#102c36" stroke-width="2"/>
+      <path d="M86 137h122M86 194h122" stroke="#78909a" stroke-width="3"/>
+      <path d="M96 128v76m15-76v76m15-76v76m15-76v76m15-76v76m15-76v76m15-76v76" stroke="#9eb0b3" stroke-width="4"/>
+      <path d="M96 128v76m15-76v76m15-76v76m15-76v76m15-76v76m15-76v76m15-76v76" stroke="#e0e6df" stroke-opacity=".18" stroke-width="1"/>
+      <path d="M145 130l-7 13 8 11-8 13 8 12-7 14" fill="none" stroke="#d0a86a" stroke-width="2" opacity=".9"/>
+      <circle cx="202" cy="166" r="3" fill="#e7bd74"/>
+    </g>
+    <g class="gate-panel gate-panel-right">
+      <rect x="210" y="126" width="126" height="80" rx="2" fill="url(#metal)" stroke="#102c36" stroke-width="2"/>
+      <path d="M212 137h122M212 194h122" stroke="#78909a" stroke-width="3"/>
+      <path d="M225 128v76m15-76v76m15-76v76m15-76v76m15-76v76m15-76v76m15-76v76" stroke="#9eb0b3" stroke-width="4"/>
+      <path d="M225 128v76m15-76v76m15-76v76m15-76v76m15-76v76m15-76v76m15-76v76" stroke="#e0e6df" stroke-opacity=".18" stroke-width="1"/>
+      <path d="M279 130l7 13-8 11 8 13-8 12 7 14" fill="none" stroke="#d0a86a" stroke-width="2" opacity=".9"/>
+      <circle cx="214" cy="166" r="3" fill="#e7bd74"/>
+    </g>
+    <path d="M84 123h252" stroke="#e5e8df" stroke-width="4" opacity=".8"/>
+  </g>
+  <g class="status-lamp"><circle cx="210" cy="43" r="8" fill="#fff"/><circle class="lamp-core" cx="210" cy="43" r="5" fill="#45a990"/></g>
+  <path class="motion-line motion-line-a" d="M113 111h-24m218 0h24" stroke="#31a6a1" stroke-width="3" stroke-linecap="round" opacity="0"/>
+  <path class="motion-line motion-line-b" d="M128 101h-13m190 0h13" stroke="#31a6a1" stroke-width="2" stroke-linecap="round" opacity="0"/>
+</svg>`;
+
+const STYLE = `
+  :host{display:block;color:var(--primary-text-color)}
+  ha-card{overflow:hidden;border:1px solid color-mix(in srgb,var(--divider-color) 55%,transparent);border-radius:26px;background:var(--ha-card-background,var(--card-background-color,#fff));box-shadow:var(--ha-card-box-shadow,0 16px 44px rgba(18,40,59,.11))}
+  .shell{padding:clamp(18px,3vw,26px);background:radial-gradient(ellipse at 15% 100%,color-mix(in srgb,var(--primary-color) 8%,transparent),transparent 48%)}
+  .head{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:16px}.brand{display:flex;align-items:center;gap:12px;min-width:0}.mark{display:grid;place-items:center;width:42px;height:42px;border-radius:14px;background:color-mix(in srgb,var(--primary-color) 12%,transparent);color:var(--primary-color);font-size:21px}.eyebrow{color:var(--secondary-text-color);font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}.title{margin:3px 0 0;overflow:hidden;font-size:clamp(18px,2.6vw,23px);letter-spacing:-.035em;text-overflow:ellipsis;white-space:nowrap}
+  .pill{display:flex;align-items:center;gap:8px;padding:8px 11px;border-radius:999px;background:var(--secondary-background-color);color:var(--secondary-text-color);font-size:11px;font-weight:750;white-space:nowrap}.dot{width:8px;height:8px;border-radius:50%;background:currentColor}.pill.open,.pill.opening{color:var(--success-color,#218a72)}.pill.closing{color:var(--warning-color,#b57500)}.pill.unavailable{color:var(--error-color,#d34444)}.pill.opening .dot,.pill.closing .dot{animation:dot-pulse 1s ease-in-out infinite}
+  .scene{position:relative;overflow:hidden;border-radius:23px;background:#e9f3ef}.gate-art{display:block;width:100%;height:auto}.gate-panel{transform-box:fill-box;backface-visibility:hidden}.gate-panel-left{transform-origin:left center}.gate-panel-right{transform-origin:right center}.scene.open .gate-panel-left{transform:perspective(620px) rotateY(-68deg)}.scene.open .gate-panel-right{transform:perspective(620px) rotateY(68deg)}
+  .scene.opening .gate-panel-left{animation:swing-open-left 2.4s cubic-bezier(.2,.72,.26,1) both}.scene.opening .gate-panel-right{animation:swing-open-right 2.4s cubic-bezier(.2,.72,.26,1) both}.scene.closing .gate-panel-left{animation:swing-close-left 2.1s cubic-bezier(.5,0,.7,.3) both}.scene.closing .gate-panel-right{animation:swing-close-right 2.1s cubic-bezier(.5,0,.7,.3) both}
+  .scene.opening .motion-line,.scene.closing .motion-line{opacity:.82;animation:motion-dash .8s ease-in-out infinite alternate}.scene.opening .motion-line-b,.scene.closing .motion-line-b{animation-delay:-.4s}.scene.opening .lamp-core{fill:#42b8df;animation:lamp-pulse .7s ease-in-out infinite alternate}.scene.closing .lamp-core{fill:#efaa4a;animation:lamp-pulse .45s ease-in-out infinite alternate}.scene.open .lamp-core{fill:#65c19a}.scene.closed .lamp-core{fill:#809198}
+  .status{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px}.status-copy{min-width:0}.state-label{font-size:clamp(23px,4vw,34px);line-height:1.05;letter-spacing:-.05em;font-weight:790}.sub-label{margin-top:5px;color:var(--secondary-text-color);font-size:12px}.position{flex:0 0 auto;text-align:right}.position-value{font-size:20px;font-weight:780;font-variant-numeric:tabular-nums}.position-caption{display:block;margin-top:3px;color:var(--secondary-text-color);font-size:10px;text-transform:uppercase;letter-spacing:.08em}.track{height:7px;margin-top:14px;overflow:hidden;border-radius:99px;background:var(--secondary-background-color)}.bar{height:100%;width:var(--position);border-radius:inherit;background:linear-gradient(90deg,#43b5a1,#4385c8);transition:width .8s ease}
+  .foot{display:flex;justify-content:space-between;gap:10px;margin-top:13px;padding-top:11px;border-top:1px solid var(--divider-color);color:var(--secondary-text-color);font-size:10px}.foot span:last-child{text-align:right}
+  @keyframes swing-open-left{0%{transform:perspective(620px) rotateY(0)}68%{transform:perspective(620px) rotateY(-76deg)}100%{transform:perspective(620px) rotateY(-68deg)}}@keyframes swing-open-right{0%{transform:perspective(620px) rotateY(0)}68%{transform:perspective(620px) rotateY(76deg)}100%{transform:perspective(620px) rotateY(68deg)}}@keyframes swing-close-left{0%{transform:perspective(620px) rotateY(-68deg)}55%{transform:perspective(620px) rotateY(-4deg)}100%{transform:perspective(620px) rotateY(0)}}@keyframes swing-close-right{0%{transform:perspective(620px) rotateY(68deg)}55%{transform:perspective(620px) rotateY(4deg)}100%{transform:perspective(620px) rotateY(0)}}@keyframes motion-dash{from{opacity:.15;transform:translateX(0)}to{opacity:1;transform:translateX(5px)}}@keyframes lamp-pulse{to{opacity:.48;transform:scale(.72)}}@keyframes dot-pulse{50%{opacity:.38}}
+  @media(max-width:480px){.shell{padding:16px}.head{gap:8px}.pill{padding:7px 9px;font-size:10px}.mark{width:37px;height:37px;border-radius:12px}.scene{border-radius:18px}}
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.scene.opening .gate-panel-left{transform:perspective(620px) rotateY(-68deg)}.scene.opening .gate-panel-right{transform:perspective(620px) rotateY(68deg)}.scene.closing .gate-panel-left,.scene.closing .gate-panel-right{transform:none}}
+`;
+
+const CONFIG_LABELS = { entity: "Gate cover entity", title: "Card title" };
+const SCHEMA = [
+  { name: "entity", required: true, selector: { entity: { domain: "cover" } } },
+  { name: "title", selector: { text: {} } },
+];
+
+class AnimatedGateCard extends HTMLElement {
+  static getConfigForm() {
+    return { schema: SCHEMA, computeLabel: (field) => CONFIG_LABELS[field.name] };
+  }
+
+  static getStubConfig() { return { entity: "cover.example_gate", title: "Entrance gate" }; }
+
+  setConfig(config) {
+    if (!config || typeof config !== "object" || !config.entity) throw new Error("Choose a cover entity for the animated gate card.");
+    this._config = { ...config };
+    this._root ??= this.attachShadow({ mode: "open" });
+    this.render();
+  }
+
+  set hass(hass) { this._hass = hass; this.render(); }
+  getCardSize() { return 4; }
+  getGridOptions() { return { rows: 4, columns: 6, min_rows: 3, max_rows: 6 }; }
+
+  escape(value) {
+    return String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
+  }
+
+  render() {
+    if (!this._root || !this._config || !this._hass) return;
+    const entity = this._hass.states?.[this._config.entity];
+    const rawState = entity?.state ?? "unavailable";
+    const state = String(rawState).toLowerCase();
+    const stateInfo = {
+      open: ["Open", "open", "Gate is fully open"],
+      opening: ["Opening", "opening", "Gate is opening"],
+      closed: ["Closed", "closed", "Gate is fully closed"],
+      closing: ["Closing", "closing", "Gate is closing"],
+      unavailable: ["Unavailable", "unavailable", "Gate status is unavailable"],
+      unknown: ["Unknown", "unavailable", "Gate status is unknown"],
+    }[state] || [this.escape(rawState), "unavailable", "Gate status" ];
+    const title = this._config.title || entity?.attributes?.friendly_name || "Entrance gate";
+    const attrPosition = entity?.attributes?.current_position;
+    const position = attrPosition !== undefined && attrPosition !== null && Number.isFinite(Number(attrPosition)) ? Math.max(0, Math.min(100, Number(attrPosition))) : null;
+    const visualState = ["open", "opening", "closing", "closed"].includes(state) ? state : "closed";
+    const progress = position === null ? (state === "open" ? 100 : state === "closed" ? 0 : 0) : position;
+    const positionMarkup = position === null ? "" : `<div class="position"><span class="position-value">${Math.round(position)}%</span><span class="position-caption">Open</span></div>`;
+    const statusMessage = position === null ? stateInfo[2] : `${stateInfo[2]} · ${Math.round(position)}% open`;
+
+    this._root.innerHTML = `<style>${STYLE}</style><ha-card><div class="shell">
+      <header class="head"><div class="brand"><div class="mark" aria-hidden="true">⌂</div><div style="min-width:0"><div class="eyebrow">Home Assistant · Cover</div><h2 class="title">${this.escape(title)}</h2></div></div><div class="pill ${stateInfo[1]}"><span class="dot"></span>${stateInfo[0]}</div></header>
+      <div class="scene ${visualState}">${GATE_ART}</div>
+      <section class="status"><div class="status-copy"><div class="state-label">${stateInfo[0]}</div><div class="sub-label">${this.escape(statusMessage)}</div></div>${positionMarkup}</section>
+      ${position !== null ? `<div class="track" aria-label="Gate opening position"><div class="bar" style="--position:${progress}%"></div></div>` : ""}
+      <footer class="foot"><span>${entity ? "Live cover status" : "Select a cover entity in card settings"}</span><span>${state === "opening" ? "Opening animation" : state === "closing" ? "Closing animation" : "Animated gate"}</span></footer>
+    </div></ha-card>`;
+  }
+}
+
+if (!customElements.get(CARD_TYPE)) customElements.define(CARD_TYPE, AnimatedGateCard);
+window.customCards = window.customCards || [];
+if (!window.customCards.some((card) => card.type === CARD_TYPE)) {
+  window.customCards.push({ type: CARD_TYPE, name: "Animated Gate Card", description: "A responsive SVG gate status card with distinct opening and closing animations", preview: true, version: VERSION, documentationURL: "https://github.com/Liionboy/lovelace-animated-gate-card" });
+}
+
+console.info(`%c ANIMATED GATE CARD %c ${VERSION} `, "color:#fff;background:#0875c9;font-weight:700", "color:#0875c9;background:#fff;font-weight:700");
