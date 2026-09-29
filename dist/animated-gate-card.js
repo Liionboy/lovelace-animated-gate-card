@@ -1,5 +1,5 @@
 const CARD_TYPE = "animated-gate-card";
-const VERSION = "1.0.1";
+const VERSION = "1.0.2";
 
 const GATE_ART = `<svg class="gate-art" viewBox="0 0 420 270" role="img" aria-label="Illustration of a double-leaf entrance gate">
   <defs>
@@ -69,6 +69,16 @@ const SCHEMA = [
 ];
 
 class AnimatedGateCard extends HTMLElement {
+  constructor() {
+    super();
+    this._onRootClick = (event) => {
+      const button = event.composedPath().find((node) => node?.dataset?.action && this._root?.contains(node));
+      if (!button) return;
+      event.preventDefault();
+      void this.performAction(button.dataset.action);
+    };
+  }
+
   static getConfigForm() {
     return { schema: SCHEMA, computeLabel: (field) => CONFIG_LABELS[field.name] };
   }
@@ -78,11 +88,20 @@ class AnimatedGateCard extends HTMLElement {
   setConfig(config) {
     if (!config || typeof config !== "object" || !config.entity) throw new Error("Choose a cover entity for the animated gate card.");
     this._config = { ...config };
-    this._root ??= this.attachShadow({ mode: "open" });
+    if (!this._root) {
+      this._root = this.attachShadow({ mode: "open" });
+      this._root.addEventListener("click", this._onRootClick);
+    }
     this.render();
   }
 
-  set hass(hass) { this._hass = hass; this.render(); }
+  set hass(hass) {
+    const nextState = this._config ? hass.states?.[this._config.entity]?.state : undefined;
+    if (this._lastEntityState !== undefined && this._lastEntityState !== nextState) this._actionMessage = "";
+    this._lastEntityState = nextState;
+    this._hass = hass;
+    this.render();
+  }
   getCardSize() { return 4; }
   getGridOptions() { return { rows: 4, columns: 6, min_rows: 3, max_rows: 6 }; }
 
@@ -129,10 +148,9 @@ class AnimatedGateCard extends HTMLElement {
         <button class="control-btn close" data-action="close" ${!entity || !canClose || busy || !["open", "opening"].includes(state) ? "disabled" : ""}><span class="icon" aria-hidden="true">↘</span><span>${busy && this._busyAction === "close" ? "Sending…" : "Close"}</span></button>
         <button class="control-btn stop" data-action="stop" ${!entity || !canStop || !moving || busy ? "disabled" : ""}><span class="icon" aria-hidden="true">■</span><span>${busy && this._busyAction === "stop" ? "Sending…" : "Stop"}</span></button>
       </section>
-      ${this._actionError ? `<div class="action-error" role="status">${this.escape(this._actionError)}</div>` : ""}
+      ${this._actionError ? `<div class="action-error" role="status">${this.escape(this._actionError)}</div>` : this._actionMessage ? `<div class="action-notice" role="status">${this.escape(this._actionMessage)}</div>` : ""}
       <footer class="foot"><span>${entity ? "Live cover status" : "Select a cover entity in card settings"}</span><span>${state === "opening" ? "Opening animation" : state === "closing" ? "Closing animation" : "Animated gate"}</span></footer>
     </div></ha-card>`;
-    this._root.querySelectorAll("[data-action]").forEach((button) => button.addEventListener("click", () => this.performAction(button.dataset.action)));
   }
 
   async performAction(action) {
@@ -154,9 +172,11 @@ class AnimatedGateCard extends HTMLElement {
     if (!supported || !allowedState) return;
     this._busyAction = action;
     this._actionError = "";
+    this._actionMessage = "";
     this.render();
     try {
       await this._hass.callService("cover", service, { entity_id: this._config.entity });
+      this._actionMessage = `${action[0].toUpperCase()}${action.slice(1)} command accepted by Home Assistant.`;
     } catch (error) {
       this._actionError = `Could not ${action} the gate. Check Home Assistant.`;
     } finally {
@@ -169,7 +189,7 @@ class AnimatedGateCard extends HTMLElement {
 if (!customElements.get(CARD_TYPE)) customElements.define(CARD_TYPE, AnimatedGateCard);
 window.customCards = window.customCards || [];
 if (!window.customCards.some((card) => card.type === CARD_TYPE)) {
-  window.customCards.push({ type: CARD_TYPE, name: "Animated Gate Card", description: "A responsive SVG gate status card with distinct opening and closing animations", preview: true, version: VERSION, documentationURL: "https://github.com/Liionboy/lovelace-animated-gate-card" });
+  window.customCards.push({ type: CARD_TYPE, name: "Animated Gate Card", description: "A responsive, animated gate card with Home Assistant controls", preview: true, version: VERSION, documentationURL: "https://github.com/Liionboy/lovelace-animated-gate-card" });
 }
 
 console.info(`%c ANIMATED GATE CARD %c ${VERSION} `, "color:#fff;background:#0875c9;font-weight:700", "color:#0875c9;background:#fff;font-weight:700");
