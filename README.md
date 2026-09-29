@@ -6,7 +6,7 @@ The card never calls services on its own. Its Open, Close, and Stop buttons call
 
 ## Features
 
-- Original SVG artwork of a swinging entrance gate, pillars, fence, and driveway, sized prominently inside a compact card layout.
+- Original, gate-focused SVG artwork of a swinging entrance gate, pillars, fence, and driveway, filling the compact scene without stretching the illustration.
 - Distinct animations for `opening` and `closing`; static open/closed appearance for those states.
 - State pill, friendly name, and current position when the cover exposes `current_position`.
 - Open, Close, and Stop controls using `cover.open_cover`, `cover.close_cover`, and `cover.stop_cover`; movement feedback follows the selected entity only, and Stop remains available whenever the cover supports it (including covers that report only `open`/`closed`).
@@ -43,7 +43,7 @@ Copy `dist/animated-gate-card.js` to `/config/www/animated-gate-card.js`, add `/
 
 ## Development
 
-Dependency-free ES module (release 1.0.7):
+Dependency-free ES module (release 1.0.8):
 
 ```sh
 npm run check
