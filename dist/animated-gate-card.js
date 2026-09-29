@@ -1,5 +1,5 @@
 const CARD_TYPE = "animated-gate-card";
-const VERSION = "1.0.3";
+const VERSION = "1.0.4";
 
 const GATE_ART = `<svg class="gate-art" viewBox="0 0 420 270" role="img" aria-label="Illustration of a double-leaf entrance gate">
   <defs>
@@ -56,7 +56,7 @@ const STYLE = `
   .scene.opening .motion-line,.scene.closing .motion-line{opacity:.82;animation:motion-dash .8s ease-in-out infinite alternate}.scene.opening .motion-line-b,.scene.closing .motion-line-b{animation-delay:-.4s}.scene.opening .lamp-core{fill:#42b8df;animation:lamp-pulse .7s ease-in-out infinite alternate}.scene.closing .lamp-core{fill:#efaa4a;animation:lamp-pulse .45s ease-in-out infinite alternate}.scene.open .lamp-core{fill:#65c19a}.scene.closed .lamp-core{fill:#809198}
   .status{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px}.status-copy{min-width:0}.state-label{font-size:clamp(23px,4vw,34px);line-height:1.05;letter-spacing:-.05em;font-weight:790}.sub-label{margin-top:5px;color:var(--secondary-text-color);font-size:12px}.position{flex:0 0 auto;text-align:right}.position-value{font-size:20px;font-weight:780;font-variant-numeric:tabular-nums}.position-caption{display:block;margin-top:3px;color:var(--secondary-text-color);font-size:10px;text-transform:uppercase;letter-spacing:.08em}.track{height:7px;margin-top:14px;overflow:hidden;border-radius:99px;background:var(--secondary-background-color)}.bar{height:100%;width:var(--position);border-radius:inherit;background:linear-gradient(90deg,#43b5a1,#4385c8);transition:width .8s ease}
   .foot{display:flex;justify-content:space-between;gap:10px;margin-top:13px;padding-top:11px;border-top:1px solid var(--divider-color);color:var(--secondary-text-color);font-size:10px}.foot span:last-child{text-align:right}.action-error,.action-notice{margin-top:8px;font-size:11px}.action-error{color:var(--error-color,#d34444)}.action-notice{color:var(--success-color,#218a72)}
-  .controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:14px}.control-btn{display:flex;align-items:center;justify-content:center;gap:8px;min-width:0;min-height:42px;padding:0 10px;border:1px solid var(--divider-color);border-radius:13px;background:var(--card-background-color,#fff);color:var(--primary-text-color);font:inherit;font-size:12px;font-weight:760;cursor:pointer;transition:background .18s ease,border-color .18s ease,transform .18s ease}.control-btn:hover:not(:disabled){transform:translateY(-1px);border-color:var(--primary-color);background:color-mix(in srgb,var(--primary-color) 7%,var(--card-background-color,#fff))}.control-btn .icon{font-size:17px;line-height:1}.control-btn.open{color:var(--success-color,#218a72)}.control-btn.close{color:var(--warning-color,#a06a00)}.control-btn.stop{color:var(--error-color,#d34444)}.control-btn:disabled{opacity:.43;cursor:not-allowed}
+  .controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:14px}.control-btn{display:flex;align-items:center;justify-content:center;gap:8px;min-width:0;min-height:42px;padding:0 10px;border:1px solid var(--divider-color);border-radius:13px;background:var(--card-background-color,#fff);color:var(--primary-text-color);font:inherit;font-size:12px;font-weight:760;cursor:pointer}.control-btn:focus-visible{outline:2px solid var(--primary-color);outline-offset:2px}.control-btn .icon{font-size:17px;line-height:1}.control-btn.open{color:var(--success-color,#218a72)}.control-btn.close{color:var(--warning-color,#a06a00)}.control-btn.stop{color:var(--error-color,#d34444)}.control-btn:disabled{opacity:.43;cursor:not-allowed}
   @keyframes swing-open-left{0%{transform:perspective(620px) rotateY(0)}68%{transform:perspective(620px) rotateY(-76deg)}100%{transform:perspective(620px) rotateY(-68deg)}}@keyframes swing-open-right{0%{transform:perspective(620px) rotateY(0)}68%{transform:perspective(620px) rotateY(76deg)}100%{transform:perspective(620px) rotateY(68deg)}}@keyframes swing-close-left{0%{transform:perspective(620px) rotateY(-68deg)}55%{transform:perspective(620px) rotateY(-4deg)}100%{transform:perspective(620px) rotateY(0)}}@keyframes swing-close-right{0%{transform:perspective(620px) rotateY(68deg)}55%{transform:perspective(620px) rotateY(4deg)}100%{transform:perspective(620px) rotateY(0)}}@keyframes motion-dash{from{opacity:.15;transform:translateX(0)}to{opacity:1;transform:translateX(5px)}}@keyframes lamp-pulse{to{opacity:.48;transform:scale(.72)}}@keyframes dot-pulse{50%{opacity:.38}}
   @media(max-width:480px){.shell{padding:16px}.head{gap:8px}.pill{padding:7px 9px;font-size:10px}.mark{width:37px;height:37px;border-radius:12px}.scene{height:164px;border-radius:18px}.gate-art{width:92%}.control-btn{gap:5px;padding:0 5px;font-size:11px}}
   @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.scene.opening .gate-panel-left{transform:perspective(620px) rotateY(-68deg)}.scene.opening .gate-panel-right{transform:perspective(620px) rotateY(68deg)}.scene.closing .gate-panel-left,.scene.closing .gate-panel-right{transform:none}}
@@ -89,7 +89,14 @@ class AnimatedGateCard extends HTMLElement {
   }
 
   set hass(hass) {
-    const nextState = this._config ? hass.states?.[this._config.entity]?.state : undefined;
+    const nextState = this._config ? String(hass.states?.[this._config.entity]?.state || "").toLowerCase() : undefined;
+    if (this._motionIntent) {
+      const targetState = this._motionIntent === "open" ? "open" : "closed";
+      const oppositeMotion = this._motionIntent === "open" ? "closing" : "opening";
+      if (nextState === targetState || nextState === "unavailable" || nextState === "unknown" || nextState === oppositeMotion) {
+        this._motionIntent = "";
+      }
+    }
     if (this._lastEntityState !== undefined && this._lastEntityState !== nextState) this._actionMessage = "";
     this._lastEntityState = nextState;
     this._hass = hass;
@@ -106,7 +113,10 @@ class AnimatedGateCard extends HTMLElement {
     if (!this._root || !this._config || !this._hass) return;
     const entity = this._hass.states?.[this._config.entity];
     const rawState = entity?.state ?? "unavailable";
-    const state = String(rawState).toLowerCase();
+    const reportedState = String(rawState).toLowerCase();
+    const state = this._motionIntent === "open" ? "opening"
+      : this._motionIntent === "close" ? "closing"
+      : reportedState;
     const stateInfo = {
       open: ["Open", "open", "Gate is fully open"],
       opening: ["Opening", "opening", "Gate is opening"],
@@ -162,7 +172,10 @@ class AnimatedGateCard extends HTMLElement {
     const service = serviceByAction[action];
     if (!service || !this._config.entity) return;
     const entity = this._hass.states?.[this._config.entity];
-    const state = String(entity?.state || "").toLowerCase();
+    const reportedState = String(entity?.state || "").toLowerCase();
+    const state = this._motionIntent === "open" ? "opening"
+      : this._motionIntent === "close" ? "closing"
+      : reportedState;
     const rawFeatures = entity?.attributes?.supported_features;
     const features = Number(rawFeatures);
     const hasFeatureInfo = rawFeatures !== undefined && rawFeatures !== null && Number.isFinite(features);
@@ -183,6 +196,7 @@ class AnimatedGateCard extends HTMLElement {
       return;
     }
     this._busyAction = action;
+    this._motionIntent = action === "open" || action === "close" ? action : "";
     this._actionError = "";
     this._actionMessage = "";
     this.render();
@@ -190,6 +204,7 @@ class AnimatedGateCard extends HTMLElement {
       await this._hass.callService("cover", service, { entity_id: this._config.entity });
       this._actionMessage = `${action[0].toUpperCase()}${action.slice(1)} command accepted by Home Assistant.`;
     } catch (error) {
+      this._motionIntent = "";
       this._actionError = `Could not ${action} the gate. Check Home Assistant.`;
     } finally {
       this._busyAction = "";
