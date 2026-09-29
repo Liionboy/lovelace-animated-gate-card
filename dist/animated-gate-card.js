@@ -1,5 +1,5 @@
 const CARD_TYPE = "animated-gate-card";
-const VERSION = "1.0.4";
+const VERSION = "1.0.5";
 
 const GATE_ART = `<svg class="gate-art" viewBox="0 0 420 270" role="img" aria-label="Illustration of a double-leaf entrance gate">
   <defs>
@@ -81,7 +81,15 @@ class AnimatedGateCard extends HTMLElement {
 
   setConfig(config) {
     if (!config || typeof config !== "object" || !config.entity) throw new Error("Choose a cover entity for the animated gate card.");
+    const entityChanged = this._config?.entity !== config.entity;
     this._config = { ...config };
+    if (entityChanged) {
+      this._entitySignature = undefined;
+      this._lastEntityState = undefined;
+      this._motionIntent = "";
+      this._actionMessage = "";
+      this._actionError = "";
+    }
     if (!this._root) {
       this._root = this.attachShadow({ mode: "open" });
     }
@@ -89,7 +97,10 @@ class AnimatedGateCard extends HTMLElement {
   }
 
   set hass(hass) {
-    const nextState = this._config ? String(hass.states?.[this._config.entity]?.state || "").toLowerCase() : undefined;
+    const entity = this._config ? hass.states?.[this._config.entity] : undefined;
+    const nextState = String(entity?.state || "unavailable").toLowerCase();
+    const nextSignature = entity ? JSON.stringify([entity.state, entity.attributes]) : "unavailable";
+    const previousMotionIntent = this._motionIntent;
     if (this._motionIntent) {
       const targetState = this._motionIntent === "open" ? "open" : "closed";
       const oppositeMotion = this._motionIntent === "open" ? "closing" : "opening";
@@ -100,7 +111,9 @@ class AnimatedGateCard extends HTMLElement {
     if (this._lastEntityState !== undefined && this._lastEntityState !== nextState) this._actionMessage = "";
     this._lastEntityState = nextState;
     this._hass = hass;
-    this.render();
+    const entityChanged = nextSignature !== this._entitySignature;
+    this._entitySignature = nextSignature;
+    if (entityChanged || previousMotionIntent !== this._motionIntent) this.render();
   }
   getCardSize() { return 4; }
   getGridOptions() { return { rows: 4, columns: 6, min_rows: 3, max_rows: 6 }; }
@@ -131,8 +144,7 @@ class AnimatedGateCard extends HTMLElement {
     const hasFeatureInfo = rawServiceFeatures !== undefined && rawServiceFeatures !== null && Number.isFinite(serviceFeatures);
     const canOpen = hasFeatureInfo ? Boolean(serviceFeatures & 1) : true;
     const canClose = hasFeatureInfo ? Boolean(serviceFeatures & 2) : true;
-    const canStop = hasFeatureInfo ? Boolean(serviceFeatures & 8) : ["opening", "closing"].includes(state);
-    const moving = ["opening", "closing"].includes(state);
+    const canStop = hasFeatureInfo ? Boolean(serviceFeatures & 8) : true;
     const busy = Boolean(this._busyAction);
     const attrPosition = entity?.attributes?.current_position;
     const position = attrPosition !== undefined && attrPosition !== null && Number.isFinite(Number(attrPosition)) ? Math.max(0, Math.min(100, Number(attrPosition))) : null;
@@ -149,7 +161,7 @@ class AnimatedGateCard extends HTMLElement {
       <section class="controls" aria-label="Gate controls">
         <button class="control-btn open" data-action="open" ${!entity || !canOpen || busy || !["closed", "closing"].includes(state) ? "disabled" : ""}><span class="icon" aria-hidden="true">↗</span><span>${busy && this._busyAction === "open" ? "Sending…" : "Open"}</span></button>
         <button class="control-btn close" data-action="close" ${!entity || !canClose || busy || !["open", "opening"].includes(state) ? "disabled" : ""}><span class="icon" aria-hidden="true">↘</span><span>${busy && this._busyAction === "close" ? "Sending…" : "Close"}</span></button>
-        <button class="control-btn stop" data-action="stop" ${!entity || !canStop || !moving || busy ? "disabled" : ""}><span class="icon" aria-hidden="true">■</span><span>${busy && this._busyAction === "stop" ? "Sending…" : "Stop"}</span></button>
+        <button class="control-btn stop" data-action="stop" ${!entity || !canStop || busy ? "disabled" : ""}><span class="icon" aria-hidden="true">■</span><span>${busy && this._busyAction === "stop" ? "Sending…" : "Stop"}</span></button>
       </section>
       ${this._actionError ? `<div class="action-error" role="status">${this.escape(this._actionError)}</div>` : this._actionMessage ? `<div class="action-notice" role="status">${this.escape(this._actionMessage)}</div>` : ""}
       <footer class="foot"><span>${entity ? "Live cover status" : "Select a cover entity in card settings"}</span><span>${state === "opening" ? "Opening animation" : state === "closing" ? "Closing animation" : "Animated gate"}</span></footer>
@@ -184,7 +196,7 @@ class AnimatedGateCard extends HTMLElement {
       : (hasFeatureInfo ? Boolean(features & 8) : true);
     const allowedState = action === "open" ? ["closed", "closing"].includes(state)
       : action === "close" ? ["open", "opening"].includes(state)
-      : ["opening", "closing"].includes(state);
+      : true;
     if (!supported) {
       this._actionError = `This cover does not support the ${action} command.`;
       this.render();
