@@ -1,14 +1,15 @@
 # Animated Gate Card
 
-A polished, responsive Home Assistant Lovelace card for gate and other cover entities. Its inline SVG depicts a double-leaf entrance gate, with separate opening and closing animations driven by the entity's live cover state.
+A polished, responsive Home Assistant Lovelace card for gate and other cover entities. Its compact inline SVG depicts a double-leaf entrance gate, with separate opening and closing animations driven by the entity's live cover state.
 
-The card is display-only: it does not call cover services, change position, fetch external assets, or contain personal entity IDs.
+The card never calls services on its own. Its Open, Close, and Stop buttons call Home Assistant's standard cover services only when clicked. The card fetches no external assets and contains no personal entity IDs.
 
 ## Features
 
-- Original SVG artwork of an entrance gate, pillars, fence, and driveway.
+- Compact, original SVG artwork of an entrance gate, pillars, fence, and driveway.
 - Distinct animations for `opening` and `closing`; static open/closed appearance for those states.
 - State pill, friendly name, and current position when the cover exposes `current_position`.
+- Open, Close, and Stop controls using `cover.open_cover`, `cover.close_cover`, and `cover.stop_cover`; buttons are disabled when the action is unsupported or does not fit the current state.
 - Native entity selector in the card editor; each user chooses their own `cover` entity.
 - Responsive layout with Home Assistant theme colors.
 - Honors the operating system's reduced-motion preference.
@@ -33,7 +34,7 @@ entity: cover.my_gate
 title: Entrance gate
 ```
 
-The card animates in response to the standard Home Assistant cover states: `opening`, `open`, `closing`, and `closed`. The current-position indicator is shown only when the entity supplies a numeric `current_position` attribute.
+The card animates in response to the standard Home Assistant cover states: `opening`, `open`, `closing`, and `closed`. The current-position indicator is shown only when the entity supplies a numeric `current_position` attribute. Open/Close are enabled when useful for the current state; Stop appears enabled only while the gate is moving and when the entity reports that Stop is supported.
 
 ## Manual resource install
 
@@ -41,7 +42,7 @@ Copy `dist/animated-gate-card.js` to `/config/www/animated-gate-card.js`, add `/
 
 ## Development
 
-Dependency-free ES module:
+Dependency-free ES module (release 1.0.1):
 
 ```sh
 npm run check
