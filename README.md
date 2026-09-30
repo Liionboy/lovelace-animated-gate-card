@@ -10,6 +10,7 @@ The card never calls services on its own. Its Open, Close, and Stop buttons call
 - Distinct animations for `opening` and `closing`; static open/closed appearance for those states.
 - State pill, friendly name, and current position when the cover exposes `current_position`.
 - Open, Close, and Stop controls using `cover.open_cover`, `cover.close_cover`, and `cover.stop_cover`; movement feedback follows the selected entity only, and Stop remains available whenever the cover supports it (including covers that report only `open`/`closed`).
+- Subtle hover and press feedback on enabled controls, with the hover treatment limited to mouse-capable devices.
 - Direct button click handling and visible pending/acknowledgement/error feedback for each cover command, including local motion tracking so Stop remains available when the integration omits intermediate movement states.
 - Native entity selector in the card editor; each user chooses their own `cover` entity.
 - Responsive layout with Home Assistant theme colors.
@@ -43,7 +44,7 @@ Copy `dist/animated-gate-card.js` to `/config/www/animated-gate-card.js`, add `/
 
 ## Development
 
-Dependency-free ES module (release 1.0.8):
+Dependency-free ES module (release 1.0.9):
 
 ```sh
 npm run check
